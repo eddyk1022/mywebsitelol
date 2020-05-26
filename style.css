@@ -1,0 +1,238 @@
+:root {
+	--lol: 1px;
+}
+
+html {
+	background-color: rgb(18,18,25);
+	user-select: none;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	font-family: "Manrope";
+	letter-spacing: -0.6px;
+	word-spacing: 4px;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+}
+
+div.main {
+	width: 100%;
+}
+
+div.main.intro {
+	filter: blur(24px);
+	width: 100%;
+}
+
+div.humanCheck {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	opacity: 0.85;
+	background-color: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+div.hcWindow {
+	height: calc(300px - 40px);
+	width: calc(500px - 40px);
+	background-color: rgb(40,40,40);
+	border-radius: 20px;
+	padding: 20px;
+}
+
+div.hcTitle {
+	
+	color: white;
+	font-family: Manrope;
+	font-weight: 500;
+	font-size: 20px;
+
+	width: 100%;
+	margin: 0 0 40px 0;
+	display: flex;
+	justify-content: center;
+}
+
+form.hcForm {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	color: white;
+	font-family: Manrope;
+	font-weight: 500;
+	font-size: 20px;
+}
+
+div.hcGrid {
+	display: grid;
+	width: 100%;
+	grid-template-columns: auto auto auto auto;
+	margin: 0 0 20px 0;
+}
+
+label.hcRadio {
+	margin: 0 0 16px 0;
+	text-align: center;
+}
+
+button.hcSubmit {
+	color: white;
+	font-family: Manrope;
+	font-weight: 500;
+	font-size: 20px;
+	border: 2px solid white;
+	padding: 4px 12px;
+	border-radius: 8px;
+	background-color: rgb(30,70,100);
+}
+
+div.header {
+	display: flex;
+	width: calc(100% - 80px);
+	height: 80px;
+	padding: 0 40px;
+	color: white;
+	justify-content: flex-start;
+	align-items: center;
+	font-family: Manrope;
+	background-color: rgb(31,31,41);
+	
+	font-weight: 800;
+}
+
+a.myName {
+	color: white;
+	text-decoration: none;
+	font-size: 36px;
+	margin: 0 80px 0 0;
+}
+
+a.headerItem {
+	transition: all 100ms;
+	text-decoration: none;
+	font-size: calc(36px * 0.75);
+	color: rgb(180,180,196);
+	margin: 0 50px 0 0;
+}
+
+a.headerItem:hover {
+	transition: all 100ms;
+	color: white;
+	text-shadow: 0 0 20px rgb(140,140,150);
+}
+
+a.headerItem.currentPage {
+	font-size: calc(36px * 0.75);
+	color: rgb(90,90,100);
+	text-decoration: none;
+	margin: 0 50px 0 0;
+}
+
+a.headerItem.currentPage:hover {
+	transition: all 100ms;
+	color: rgb(70,70,78);
+	text-shadow: none;
+}
+
+div.intro {
+	height: calc(100vh - 80px);
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+div.myTitle {
+	width: 100;
+	height: fit-content;
+	text-align: center;
+	font-weight: 800;
+}
+
+span.myNameIs {
+	font-size: 40px;
+	color: rgb(130,130,140);
+}
+
+span.edwardKim {
+	text-shadow: 0 0 100px rgb(150,150,160), 0 0 10px rgb(0,0,4);
+	font-size: 64px;
+	color: rgb(200,200,216);
+}
+
+div.pageSelection {
+	display: flex;
+	width: 30%;
+	min-width: 500px;
+	height: 50px;
+	margin: 100px 0 0 0;
+	justify-content: space-between;
+}
+
+a.pageButton {
+	text-decoration: none;
+	transition: all 100ms;
+	height: 100%;
+	font-weight: 800;
+	color: rgb(200,200,216);
+	font-size: 36px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0 16px;
+}
+
+a.pageButton:hover {
+	transition: all 100ms;
+	color: white;
+	text-shadow: 0 0 40px rgb(140,140,160);
+}
+
+div.galleryFrame {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	padding: 100px 0;
+}
+
+div.gallery {
+	min-width: 600px;
+	max-width: 1200px;
+	width: calc(100% - 200px);
+	height: fit-content;
+}
+
+img.galleryPic {
+	border-radius: 10px;
+	max-width: 100%;
+	box-shadow: 0 0 100px rgb(6,6,8);
+}
+
+img.galleryPic.lessSat {
+	filter: saturate(85%);
+}
+
+div.galleryCaption {
+	margin: 10px 0 230px 0;
+	padding: 0 100px;
+	width: calc(100% - 200px);
+	text-align: center;
+	font-size: 22px;
+	font-weight: 800;
+	color: rgb(200,200,216);
+}
+
+div.foodSegment {
+	
+}

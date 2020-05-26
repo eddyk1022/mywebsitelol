@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Page of Edward</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+		<div class="humanCheck" id="hc">
+			<div class="hcWindow">
+				<div class="hcTitle">Bot check - what is the page owner's name</div>
+				<form class="hcForm">
+			  	<div class="hcGrid" id="hcGrid">
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc0">Mike</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc1">Joseph</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc2">Andrew</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc3">Rowan</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc4">Damian</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc5">Tom</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc6">James</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc7">Harry</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc8">Noah</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc9">Edward</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc10">Nathan</label>
+						<label class="hcRadio"><input type="radio" name="hcChoice" id="hc11">David</label>
+					</div>
+					<button type="button" onclick="checkHC()" class="hcSubmit" id="hcSubmit">Let me in</button>
+			</div>
+		</div>
+		<div class="header">
+			<a class="myName">The Page of Edward</a>
+			<a class="headerItem" id="dateDisplay" onmouseover="showDOB()" onmouseout="hideDOB()"></a>
+		</div>
+		<div class="main intro" id="mainDiv">
+			<div class="intro">
+				<div class="myTitle">
+					<span class="myNameIs">Hi, my name is</span><br>
+					<span class="edwardKim">Edward Kim</span>
+				</div>
+				<div class="pageSelection">
+					<a class="pageButton" href="photos.html">Photos</a>
+					<a class="pageButton" href="calc.html">Calc</a>
+					<a class="pageButton" href="https://roblox.com">Roblox</a>
+				</div>
+			</div>
+		</div>
+  </body>
+</html>
+
+<script>
+	function docID(text) {
+		return document.getElementById(text);
+	}
+
+	function checkHC() {
+		for(i=0; i <= 11; i++) {
+			if(docID("hc"+i).checked) {
+				if (i==9) {
+					docID("hcSubmit").value = "Correct";
+					docID("hc").style.display = "none";
+					docID("mainDiv").style.filter = "none";
+					break;
+				}
+				else {
+					docID("hcSubmit").value = "Wrong";
+				}
+			}
+		}
+	}
+
+	function showDOB() {
+		docID("dateDisplay").innerHTML = "October 22, 2003";
+	}
+
+	function hideDOB() {
+		today = new Date();
+		d = today.getDate();
+		m = today.getMonth();
+		y = today.getFullYear();
+
+		switch(m) {
+			case 0: m="January"; break;
+			case 1: m="February"; break;
+			case 2: m="March"; break;
+			case 3: m="April"; break;
+			case 4: m="May"; break;
+			case 5: m="June"; break;
+			case 6: m="July"; break;
+			case 7: m="August"; break;
+			case 8: m="September"; break;
+			case 9: m="October"; break;
+			case 10: m="November"; break;
+			case 11: m="December"; break;
+		}
+
+		docID("dateDisplay").innerHTML = m + " " + d + ", " + y;
+	}
+
+	//    DELETE  LATER
+	docID("hcSubmit").value = "Correct";
+	docID("hc").style.display = "none";
+	docID("mainDiv").style.filter = "none";
+
+	hideDOB();
+</script>

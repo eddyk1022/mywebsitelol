@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Page of Edward - Calc</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css?family=Inter:500,700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+		<div class="header">
+			<a class="myName" href="index.html">The Page of Edward</a>
+			<a class="headerItem" href="photos.html">Photos</a>
+			<a class="headerItem currentPage">Calc</a>
+			<a class="headerItem" href="https://roblox.com">Roblox</a>
+		</div>
+		<div class="main">
+			<div class="calc">
+				<div class="topSection">
+					<div class="topSection left">
+						<div class="settings">
+							<div class="title">
+								<span style="font-size: 32px;">ExpoCalc</span>
+								<span style="color: rgb(170,70,40)">USD version</span><br>
+								<span style="color: rgb(150,150,160)">This is what I made as<br>my APCSP Create Task</span>
+							</div>
+							<div class="valueSetter">
+								<div class="valueBoxDesc">Initial value</div>
+								<input type="text" class="valueBox" id="initInput" oninput="showLoading()">
+							</div>
+							<div class="valueSetter">
+								<div class="valueBoxDesc">Growth rate</div>
+								<input type="text" class="valueBox" id="rateInput" oninput="showLoading()">
+							</div>
+							<div class="compFormDiv">
+								<form class="compForm">
+									<input id="noComp" type="radio" name="compRadio" oninput="showLoading()" checked="true">
+									<label for="noComp">Regular</label><br><br>
+									<input id="compFreq" type="radio" name="compRadio" oninput="showLoading()">
+									<label for="compFreq">Compound</label><br>
+									<select id="freqInput" class="compFreq" oninput="showLoading()">
+										<option value="c">Continuously (e)</option>
+										<option value="sa">Semi-annually</option>
+										<option value="q">Quarterly</option>
+										<option value="m">Monthly</option>
+										<option value="w">Weekly</option>
+										<option value="wp">Weekly (precise)</option>
+										<option value="d">Daily</option>
+										<option value="dp">Daily (precise)</option>
+									</select>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="topSection right">
+						<div class="sheetConfig">
+							<div style="display: flex">
+								<div class="configDesc">Year</div>
+								<input type="number" class="configNum" min="0" max="9999" value="0" id="rangeMinInput" oninput="showLoading()">
+								<div class="configDesc">to</div>
+								<input type="number" class="configNum" min="0" max="9999" value="10" id="rangeMaxInput" oninput="showLoading()">
+							</div>
+						</div>
+						<div class="sheetWindow">
+							<div class="sheetContainer">
+								<div class="loadingWindow" id="loadingScreen" style="display: flex" onclick="inspect()">
+									<div class="loadingLabel" id="loadingLabel">Click here to calculate</div>
+									<div class="loadingShade"></div>
+								</div>	
+								<div class="sheetBox">				
+									<table class="expSheet" id="expSheet">
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+  </body>
+</html>
+
+<script>
+	// Shortcut abstraction of getting an html element object
+	function docID(elem) {
+		return document.getElementById(elem);
+	}
+
+	ns = ""; // Empty string used to call concat()
+	e = Math.exp(1); // constant e for continuous compounding
+	sheet = docID("expSheet");
+	
+	// Filter and store each input values, and give warnings if error
+	function inspect() {
+		result = "pass"; // Default result value
+
+		// Get the input values
+		init = parseFloat(docID("initInput").value);
+		rate = parseFloat(docID("rateInput").value);
+		min = parseInt(docID("rangeMinInput").value);
+		max = parseInt(docID("rangeMaxInput").value);
+		
+		// Get the compounding type value
+		if (docID("noComp").checked) {
+			comp = 1;
+		} else {
+			switch(docID("freqInput").selectedIndex) {
+				case 0: comp = 0; break;
+				case 1: comp = 2; break;
+				case 2: comp = 4; break;
+				case 3: comp = 12; break;
+				case 4: comp = 52; break;
+				case 5: comp = 52.177457; break;
+				case 6: comp = 365;	break;
+				case 7:	comp = 365.2422; break;
+			}
+		}
+
+		/*
+		comp = 0 -> Continuous compound interest
+		comp = 1 -> No compounding
+		comp >= 2 -> Other compounding options
+		*/
+
+		// fail and warn if each value is not within range
+		try {
+			if(!(init > 0 && init <= 2147483647)) {
+				result = "fail";
+				flashRed("initInput");
+			}
+			if(!(rate > 0 && rate < 10)) {
+				result = "fail";
+				flashRed("rateInput");
+			}
+			if(!(min >= 0 && min <= 9999)) {
+				result = "fail";
+				flashRed("rangeMinInput");
+			}
+			if(!(max >= min && max <= 9999)) {
+				result = "fail";
+				flashRed("rangeMaxInput");
+			}
+		} catch(error) {
+			console.log("Caught: error was: " + error);
+		}
+		if (result == "fail") { // If failed, warn to fix issues
+			docID("loadingLabel").innerHTML = "Fix config issues";
+			return "NaN return"; 
+		} else if (result == "pass") { // If passed, run the calculation with the parameters
+			calculate(init, rate, comp, min, max);
+		}
+	}
+
+	function calculate(init, rate, comp, min, max) {
+		// Put up the loading screen
+		docID("loadingLabel").innerHTML = "Calculating...";
+		// Delete all child elements of sheet and replace the header row
+		docID("expSheet").innerHTML = "<tr><td>Year</td><td>Value</td><td>Expression</td></tr>";
+		// Set timeout for re-calculation after click
+		setTimeout(function(){
+			// Put in updated values to sheet
+			for (let x = min; x <= max; x++) {
+				value = growthValueUSD(init, rate, comp, x); // Get the growth value using the parameters
+				expsn = printExpression(init, rate, comp, x); // Make the string for the math expression
+				newRow = document.createElement("tr"); // Make a new row element
+				newRow.innerHTML = "<td>"+x+"</td><td>"+value+"</td><td>"+expsn+"</td>"; // Put the values into the new row
+				sheet.appendChild(newRow); // Put the row element into the spreadsheet
+			}
+			// Hide the loading screen after done calculating
+			hideLoading();
+		}, 0);
+	}
+
+	function printExpression(init, rate, comp, x) {
+		// Concatenate string to form and display the expression to get the growth value
+		// The if statements are to determine what type of compounding to use
+		if(comp >= 2){
+			return ns.concat(init, "*(1+((", rate, "-1)", "/", comp, "))^(", comp, "*", x, ")");
+		} else if(comp == 1) {
+			return ns.concat(init, "*(", rate, ")^", x);
+		} else if(comp == 0) {
+			return ns.concat(init, "*e^(", rate-1, "*", x, ")");
+		}
+	}
+
+	function growthValueUSD(init, rate, comp, x) {
+		// Calculate the growth value, using the parameters for the exponential equation
+		// Try the if statement and move on if no errors
+		try {
+			// Determine what type of compounding to use, from the parameter
+			if (comp >= 2){
+				// Equation for periodically compounded interest
+				preciseAnswer = init * (Math.pow(1 + ((rate-1) / comp), (comp * x)));
+			} else if (comp == 1) {
+				// Equation for regular interest
+				preciseAnswer = init * (Math.pow(rate, x));
+			} else if (comp == 0) {
+				// Equation for continuously compounded interest
+				preciseAnswer = init * (Math.pow(e, ((rate-1) * x)));
+			} else {
+				// Manually catch comp value out of range
+				preciseAnswer = "PreciseAnswerError";
+				console.log("PreciseAnswerError");
+			}
+			// Round precise growth value to financial value
+			return preciseAnswer.toFixed(2);
+		}
+		catch(error) { // Catch any extra errors in giving growth value
+			console.log(error);
+			return "error";
+		}
+	}
+
+	// Other appearance and toggle functions
+	function showLoading() {
+		backToNormal("initInput");
+		backToNormal("rateInput");
+		backToNormal("freqInput");
+		backToNormal("rangeMinInput");
+		backToNormal("rangeMaxInput");
+
+		docID("loadingScreen").style.display = "flex";
+		docID("loadingLabel").innerHTML = "Click here to calculate";
+	}
+
+	function hideLoading() {
+		docID("loadingScreen").style.display = "none";
+		docID("loadingLabel").innerHTML = "Click here to calculate";
+	}
+
+	function flashRed(id) {
+		docID(id).style = "color: rgb(200,40,0); background-color: rgb(70,40,30)";
+		docID(id).style.border = "2px solid rgb(200,40,0)";
+	}
+
+	function backToNormal(id) {
+		docID(id).style = "color: rgb(200,200,216); background-color: rgb(40,40,46)";
+		docID(id).style.border = "2px solid rgb(120,120,130)";
+	}
+</script>
+
+<style>
+	html {
+		width: 100%;
+		height: 100%;
+		font-family: "Inter";
+		font-weight: 500;
+		font-size: 16px;
+		user-select: none;
+		background-color: rgb(30,30,37);
+		color: rgb(200,200,216);
+	}
+		
+	body {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+
+	input:focus {
+		background-color: rgb(80,70,40);
+		outline: none;
+	}
+
+	input {
+		color: rgb(200,200,216);
+		background-color: rgb(40,40,46);
+		border: 2px solid rgb(120,120,130);
+		border-radius: 5px;
+		font-family: "Inter";
+		font-weight: "500";
+	}
+
+	input[type=radio] {
+		-webkit-appearance: none;
+		width: 15px;
+		height: 15px;
+		background-color: rgb(30,30,37);
+		border: 2.5px solid rgb(70,70,78);
+	}
+
+	input[type=radio]:checked {
+		background-color: rgb(235,235,255);
+	}
+
+	div.main {
+		width: 100%;
+		height: calc(100% - 80px);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	div.calc {
+		margin: 16px;
+		height: calc(100% - 32px);
+		min-height: 600px;
+		max-height: 680px;
+		width: calc(100% - 32px);
+		min-width: 800px;
+		max-width: 1200px;
+		display: block;
+	}
+
+	div.topSection {
+		display: flex;
+		height: 100%;
+		width: 100%;
+	}
+
+	div.topSection.left {
+		height: 100%;
+		width: 250px;
+		display: block;
+	}
+
+	div.topSection.right {
+		display: block;
+		height: 100%;
+		width: calc(100% - 250px);
+	}
+
+	div.sheetConfig {
+		width: 100%;
+		height: 50px;
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+	}
+
+	div.configDesc {
+		font-size: 18px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	input[type=number].configNum {
+		font-weight: 500;
+		padding: 0 2px;
+		margin: 0 8px;
+		font-size: 20px;
+		width: 68px;
+		height: 22px;
+	}
+
+	input[type=number].configNum.short {
+		width: 40px;
+	}
+
+	div.sheetWindow {
+		height: calc(100% - 50px);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	div.sheetContainer {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	div.loadingWindow {
+		display: flex;
+		z-index: 3;
+		position: absolute;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+	}
+
+	div.loadingShade {
+		z-index: 4;
+		position: absolute;
+		background-color: rgb(50,50,57);
+		opacity: 0.9;
+		width: 100%;
+		height: 100%;
+	}
+
+	div.loadingLabel {
+		position: absolute;
+		z-index: 5;
+		color: rgb(255,255,255);
+		border-radius: 16px;
+		height: 80px;
+		width: 240px;
+		font-weight: 700;
+		font-size: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	div.sheetBox {
+		position: relative;
+		overflow-y: scroll;
+		overflow-x: visible;
+		width: 100%;
+		height: 100%;
+	}
+
+	table.expSheet {
+		z-index: 0;
+		position: absolute;
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	td {
+		padding: 6px;
+		font-size: 18px;
+	}
+
+	tr:nth-child(1) {
+		font-weight: 700;
+		background-color: rgb(50,50,58);
+	}
+
+	td:nth-child(1) {
+		padding-left: 32px;
+		text-align: right;
+	}
+
+	td:nth-child(2) {
+		padding-left: 24px;
+		text-align: left;
+		font-weight: 700;
+	}
+
+	td:nth-child(3) {
+		padding-right: 16px;
+		text-align: right;
+		font-size: 15px;
+	}
+
+	tr {
+		border: 1px solid rgb(100,100,110);
+	}
+
+	div.settings {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+	}
+
+	div.title {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		text-align: center;
+		height: 100px;
+		font-weight: 700;
+	}
+
+	div.compFormDiv {
+		height: 140px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	form.compForm {
+		font-size: 20px;
+	}
+
+	select.compFreq {
+		color: rgb(200,200,216);
+		background-color: rgb(40,40,46);
+		border: 2px solid rgb(120,120,130);
+		font-weight: 700;
+		padding: 0 2px;
+		margin: 0 0 0 28px;
+		font-size: 14px;
+		width: 146px;
+		height: 26px;
+	}
+
+	div.valueSetter {
+		height: 74px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	div.valueBoxDesc {
+		font-size: 20px;
+		height: 14px;
+		width: 100%;
+		text-align: center;
+	}
+
+	div.valueBoxDesc {
+		font-size: 20px;
+		height: 14px;
+		width: 100%;
+		text-align: center;
+	}
+
+	input[type=text].valueBox {
+		padding: 0 4px;
+		display: flex;
+		align-content: center;
+		font-family: "Roboto Condensed";
+		text-align: center;
+		height: 46px;
+		width: 75%;
+		font-size: 36px;
+	}
+</style>
